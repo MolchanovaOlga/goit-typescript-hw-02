@@ -1,13 +1,22 @@
 import css from './ImageCard.module.css';
+import { Image, ModalData } from '../../types';
 
-const ImageCard = ({ items, onClickImg }) => {
+type ImageCardProps = {
+  item: Image;
+  onClickImg: (obj: ModalData) => void;
+};
+
+const ImageCard: React.FC<ImageCardProps> = ({
+  item,
+  onClickImg,
+}: ImageCardProps) => {
   const {
     urls: { small, regular },
     alt_description,
     description,
     likes,
     user: { name, location },
-  } = items;
+  } = item;
   return (
     <>
       <img

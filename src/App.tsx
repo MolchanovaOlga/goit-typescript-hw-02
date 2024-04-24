@@ -11,20 +11,21 @@ import ErrorMessage from './components/ErrorMessage/ErrorMessage';
 import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
 import Loader from './components/Loader/Loader';
 import ImageModal from './components/ImageModal/ImageModal';
+import { Image, ModalData } from './types';
 
 const perPage = 20;
 
 function App() {
-  const [searchQuery, setsearchQuery] = useState(null);
-  const [gallery, setGallery] = useState(null);
-  const [pages, setPages] = useState(1);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [modalImg, setModalImg] = useState({});
-  const [loadMore, setLoadMore] = useState(false);
+  const [searchQuery, setsearchQuery] = useState<string | null>(null);
+  const [gallery, setGallery] = useState<Image[] | null>(null);
+  const [pages, setPages] = useState<number>(1);
+  const [error, setError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+  const [modalImg, setModalImg] = useState<ModalData | null>(null);
+  const [loadMore, setLoadMore] = useState<boolean>(false);
 
-  const onSetSearchQuery = query => {
+  const onSetSearchQuery = (query: string): void => {
     setPages(1);
     setGallery([]);
     setsearchQuery(query);
@@ -39,15 +40,19 @@ function App() {
       try {
         setLoading(true);
         setError(false);
-        const data = await requestByKeyWord(searchQuery, pages, perPage);
-
+        const data: { total: number; results: Image[] } =
+          await requestByKeyWord(searchQuery, pages, perPage);
         if (data.total === 0) {
           message();
           return;
         }
 
-        setGallery(prev => {
-          return [...prev, ...data.results];
+        setGallery((prev): Image[] | null => {
+          if (prev) {
+            return [...prev, ...data.results];
+          }
+
+          return prev;
         });
 
         if (data.total > perPage && pages < data.total / perPage) {
@@ -73,7 +78,7 @@ function App() {
     scrollController.disabledScroll();
   };
 
-  const afterOpenModal = obj => {
+  const afterOpenModal = (obj: ModalData) => {
     setModalImg(obj);
     openModal();
   };
@@ -95,11 +100,13 @@ function App() {
         gallery.length !== 0 &&
         !loading &&
         loadMore && <LoadMoreBtn handleClick={handleClick} />}
-      <ImageModal
-        isOpen={modalIsOpen}
-        closeModal={closeModal}
-        data={modalImg}
-      />
+      {modalImg && (
+        <ImageModal
+          isOpen={modalIsOpen}
+          closeModal={closeModal}
+          data={modalImg}
+        />
+      )}
     </>
   );
 }

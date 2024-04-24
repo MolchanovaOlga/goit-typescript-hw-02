@@ -1,13 +1,18 @@
 import toast, { Toaster } from 'react-hot-toast';
 import { LuSearch } from 'react-icons/lu';
+import { FormEvent } from 'react';
 
 import css from './SearchBar.module.css';
 
-const SearchBar = ({ onSearch }) => {
-  const handleSubmit = evt => {
+type SearchBarProps = {
+  onSearch: (query: string) => void;
+};
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch }: SearchBarProps) => {
+  const handleSubmit = (evt: React.FormEvent) => {
     evt.preventDefault();
-    const form = evt.target;
-    const inputValue = form.elements.searchInput.value;
+    const form = evt.target as HTMLFormElement;
+    const inputValue = form.searchInput.value;
     if (inputValue.trim() === '') {
       toast('Please enter search term!', {
         duration: 4000,
