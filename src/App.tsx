@@ -11,7 +11,7 @@ import ErrorMessage from './components/ErrorMessage/ErrorMessage';
 import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
 import Loader from './components/Loader/Loader';
 import ImageModal from './components/ImageModal/ImageModal';
-import { Image, ModalData } from './types';
+import { Image, ModalData, ResponseData } from './types';
 
 const perPage = 20;
 
@@ -40,25 +40,30 @@ function App() {
       try {
         setLoading(true);
         setError(false);
-        const data: { total: number; results: Image[] } =
-          await requestByKeyWord(searchQuery, pages, perPage);
-        if (data.total === 0) {
-          message();
-          return;
-        }
-
-        setGallery((prev): Image[] | null => {
-          if (prev) {
-            return [...prev, ...data.results];
+        if (searchQuery !== null) {
+          const data: ResponseData = await requestByKeyWord(
+            searchQuery,
+            pages,
+            perPage
+          );
+          if (data.total === 0) {
+            message();
+            return;
           }
 
-          return prev;
-        });
+          setGallery((prev): Image[] | null => {
+            if (prev) {
+              return [...prev, ...data.results];
+            }
 
-        if (data.total > perPage && pages < data.total / perPage) {
-          setLoadMore(true);
-        } else {
-          setLoadMore(false);
+            return prev;
+          });
+
+          if (data.total > perPage && pages < data.total / perPage) {
+            setLoadMore(true);
+          } else {
+            setLoadMore(false);
+          }
         }
       } catch (error) {
         setError(true);

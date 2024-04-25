@@ -17,3 +17,8 @@ export interface ModalData {
   alt_description: string;
   description: string;
 }
+
+export interface ResponseData {
+  total: number;
+  results: Image[];
+}
